@@ -196,6 +196,28 @@ const app = {
             }
         }
     },
+    // Lắng nghe hành vi click vào playlist
+    // Listen to playlist clicks
+    playlist.onclick = function (e) {
+      const songNode = e.target.closest(".song:not(.active)");
+
+      if (songNode || e.target.closest(".option")) {
+        // Xử lý khi click vào song
+        // Handle when clicking on the song
+        if (songNode) {
+          _this.currentIndex = Number(songNode.dataset.index);
+          _this.loadCurrentSong();
+          _this.render();
+          audio.play();
+        }
+
+        // Xử lý khi click vào song option
+        // Handle when clicking on the song option
+        if (e.target.closest(".option")) {
+        }
+      }
+    };
+  },
     scrollToActiveSong(){
         const songActive = $('.song.active')
         
@@ -253,7 +275,10 @@ const app = {
 
         //render playlist
         this.render();
-        
+        // Hiển thị trạng thái ban đầu của button repeat & random
+        // Display the initial state of the repeat & random button
+        randomBtn.classList.toggle("active", this.isRandom);
+        repeatBtn.classList.toggle("active", this.isRepeat);
     }
 
 }
