@@ -195,7 +195,6 @@ const app = {
             }else{
                 nextSongBtn.click()
             }
-        }
     },
     // Lắng nghe hành vi click vào playlist
     // Listen to playlist clicks
