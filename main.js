@@ -12,7 +12,7 @@ const nextSongBtn = $('.btn-next')
 const prevSongBtn = $('.btn-prev')
 const randomBtn = $('.btn-random')
 const repeatBtn = $('.btn-repeat')
-const playlist = $(".playlist");
+const playlist = $('.playlist');
 
 const app = {
     currentIndex: 0,
