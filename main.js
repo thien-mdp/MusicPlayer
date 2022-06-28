@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
+const PLAYER_STORAGE_KEY = 'PLAYER'
+
 const heading = $('header h2')
 const cdThumb = $('.cd-thumb')
 const audio = $('#audio')
@@ -12,13 +14,16 @@ const nextSongBtn = $('.btn-next')
 const prevSongBtn = $('.btn-prev')
 const randomBtn = $('.btn-random')
 const repeatBtn = $('.btn-repeat')
-const playlist = $('.playlist');
+const playlist = $('.playlist')
 
 const app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+    
+
     songs: [{
             name: 'Waiting For Love',
             singer: 'Avicii',
@@ -56,29 +61,52 @@ const app = {
             image: './assets/img/lilpump.jpg'
         },
         {
-            name: 'Dragon 2',
-            singer: 'John Towell',
-            path: './assets/music/song6.mp3',
-            image: './assets/img/img6.jpg'
+            name: 'Gieo Quẻ',
+            singer: 'Hoàng Thùy Linh - Đen Vâu',
+            path: './assets/music/GieoQue-HoangThuyLinhDen-7125031.mp3',
+            image: './assets/img/gieoque.jpg'
         },
         {
-            name: 'AK - Top of the world',
-            singer: 'Aland',
-            path: './assets/music/song2.mp3',
-            image: './assets/img/img2.jpg'
+            name: 'Vì Mẹ Anh Bắt Chia Tay',
+            singer: 'Miu Lê - Karik - Châu Đăng Khoa',
+            path: './assets/music/vimeanhbatchiatay.mp3',
+            image: './assets/img/vimeanhbct.jpg'
         },
         {
-            name: 'Sparkle',
-            singer: 'RADWIMPS',
-            path: './assets/music/song7.mp3',
-            image: './assets/img/img7.jpg'
+            name: 'Hẹn Gặp Em Dưới Ánh Trăng',
+            singer: 'HIEUTHUHAI',
+            path: './assets/music/hengapemduoianhtrang.mp3',
+            image: './assets/img/hengapemduoianhtrang.jpg'
+        },
+        {
+            name: 'Bật Nhạc Lên',
+            singer: 'HIEUTHUHAI - Harmonie',
+            path: './assets/music/BatNhacLen1-HIEUTHUHAIHarmonie-6351919.mp3',
+            image: './assets/img/batnhaclen.jpg'
+        },
+        {
+            name: 'Yêu Người Như Anh',
+            singer: 'Đạt G - Bray - Masew',
+            path: './assets/music/yeunguoinhuanh.mp3',
+            image: './assets/img/yeunguoinhuanh.jpg'
+        },
+        {
+            name: 'Việt Nam Những Chuyến Đi',
+            singer: 'Vicky Nhung',
+            path: './assets/music/vnnhungchuyendi.mp3',
+            image: './assets/img/vnnhungchuyendi.jpg'
         }
     ],
+
+    setConfig: function(key,value){
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
 
     render: function () {
         const htmls = this.songs.map((song, index) => {
             return `
-            <div class="song ${index === this.currentIndex ? 'active' : ''}">
+            <div class="song ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
                 <div class="thumb" style="background-image: url('${song.image}')">
                 </div>
                 <div class="body">
@@ -91,7 +119,7 @@ const app = {
             </div>
             `
         })
-        $('.playlist').innerHTML = htmls.join('')
+        playlist.innerHTML = htmls.join('')
         
     },
 
@@ -181,12 +209,15 @@ const app = {
         // Random playlist
         randomBtn.onclick = function(e){
                 _this.isRandom = !_this.isRandom
+                _this.setConfig('isRandom', _this.isRandom)
                 randomBtn.classList.toggle('active',_this.isRandom)
         }
         //xử lý lặp lại bài hát
         repeatBtn.onclick = function(e){
             _this.isRepeat = !_this.isRepeat
+            _this.setConfig('isRepeat', _this.isRepeat)
             repeatBtn.classList.toggle('active', _this.isRepeat)
+            
         }
         // xử lý khi nextsong khi hết bài
         audio.onended = function() {
@@ -195,29 +226,23 @@ const app = {
             }else{
                 nextSongBtn.click()
             }
+        }
+        // xử lý click vào playlist
+        playlist.onclick = function(e){
+            const songNode = e.target.closest('.song:not(.active)')
+            if(songNode || e.target.closest('.option') ){
+                // xu lys khi click vao song
+                if (songNode){
+                    _this.currentIndex = Number(songNode.dataset.index)
+                    _this.loadCurrentSong()
+                    _this.render()
+                    audio.play()
+                }   
+
+            }
+        }
     },
-    // Lắng nghe hành vi click vào playlist
-    // Listen to playlist clicks
-    playlist.onclick = function (e) {
-      const songNode = e.target.closest(".song:not(.active)");
 
-      if (songNode || e.target.closest(".option")) {
-        // Xử lý khi click vào song
-        // Handle when clicking on the song
-        if (songNode) {
-          _this.currentIndex = Number(songNode.dataset.index);
-          _this.loadCurrentSong();
-          _this.render();
-          audio.play();
-        }
-
-        // Xử lý khi click vào song option
-        // Handle when clicking on the song option
-        if (e.target.closest(".option")) {
-        }
-      }
-    };
-  },
     scrollToActiveSong(){
         const songActive = $('.song.active')
         
@@ -239,6 +264,10 @@ const app = {
         cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
         audio.src = this.currentSong.path
         
+    },
+    loadConfig: function() {
+        this.isRandom = this.config.isRandom
+        this.isRepeat = this.config.isRepeat
     },
     nextSong: function(){
         this.currentIndex ++
@@ -264,6 +293,8 @@ const app = {
     },
 
     start: function () {
+        // gan cau hinh tu config vao ung dung
+        this.loadConfig()
         // định nghĩa các thuộc tính
         this.defineProperties() 
 
@@ -275,10 +306,10 @@ const app = {
 
         //render playlist
         this.render();
-        // Hiển thị trạng thái ban đầu của button repeat & random
-        // Display the initial state of the repeat & random button
-        randomBtn.classList.toggle("active", this.isRandom);
-        repeatBtn.classList.toggle("active", this.isRepeat);
+        
+        //hien thi trang thai ban dau cua  button repeat & random
+        repeatBtn.classList.toggle('active', this.isRepeat)
+        randomBtn.classList.toggle('active',this.isRandom)
     }
 
 }
