@@ -210,14 +210,43 @@ const app = {
         randomBtn.onclick = function(e){
                 _this.isRandom = !_this.isRandom
                 _this.setConfig('isRandom', _this.isRandom)
-                randomBtn.classList.toggle('active',_this.isRandom)
+                const a = randomBtn.classList.toggle('active',_this.isRandom)
+                if(a){
+                    toast({
+                    title: 'Random Playlist !',
+                    message: 'Turn on!',
+                    type: 'success',
+                    duration: 2500
+                });
+                }else {
+                    toast({
+                        title: 'Random Playlist !',
+                        message: 'Turn off!',
+                        type: 'warning',
+                        duration: 2500
+                    });
+                }
         }
         //xử lý lặp lại bài hát
         repeatBtn.onclick = function(e){
             _this.isRepeat = !_this.isRepeat
             _this.setConfig('isRepeat', _this.isRepeat)
-            repeatBtn.classList.toggle('active', _this.isRepeat)
-            
+            const a = repeatBtn.classList.toggle('active', _this.isRepeat)
+            if(a){
+                toast({
+                    title: 'Repeat Song ',
+                    message: 'Turn on!',
+                    type: 'success',
+                    duration: 2500
+                });
+            }else {
+                toast({
+                    title: 'Repeat Song',
+                    message: 'Turn off!',
+                    type: 'warning',
+                    duration: 2500
+                });
+            }
         }
         // xử lý khi nextsong khi hết bài
         audio.onended = function() {
